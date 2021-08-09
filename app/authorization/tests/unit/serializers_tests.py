@@ -4,7 +4,7 @@ from rest_framework.serializers import ValidationError
 from authorization.serializers import RegisterSerializer
 
 
-class RegisterSerializerTest(TestCase):
+class TestSerializerTest(TestCase):
     def setUp(self):
         self.user_attributes = {
             "username": "testusername",
@@ -24,8 +24,8 @@ class RegisterSerializerTest(TestCase):
 
     def test_successful_validation_returns_user_attributes(self):
         self.assertEqual(
-            self.serializer.validate(
-                attrs=self.user_attributes), self.user_attributes
+            self.serializer.validate(attrs=self.user_attributes),
+            self.user_attributes
         )
 
     def test_validation_of_non_matching_passwords(self):
@@ -33,4 +33,5 @@ class RegisterSerializerTest(TestCase):
         self.assertRaises(
             ValidationError,
             self.serializer.validate,
-            attrs=self.user_attributes)
+            attrs=self.user_attributes
+        )

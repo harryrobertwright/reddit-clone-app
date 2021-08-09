@@ -3,7 +3,7 @@ from django.test import Client, TestCase
 from authorization.views import RegisterView
 
 
-class RegisterViewTest(TestCase):
+class TestRegisterView(TestCase):
     def setUp(self):
         self.user_attributes = {
             "username": "testusername",
@@ -16,14 +16,26 @@ class RegisterViewTest(TestCase):
 
     def test_successful_user_registration(self):
         response = self.client.post("/auth/register/", self.user_attributes)
-        self.assertEqual(201, response.status_code)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(
+            '{"message":"User successfully registered."}',
+            response.content.decode("utf-8"),
+        )
 
     def test_cannot_register_duplicate_user(self):
         self.client.post("/auth/register/", self.user_attributes)
         response = self.client.post("/auth/register/", self.user_attributes)
         self.assertEqual(400, response.status_code)
+        self.assertEqual(
+            '{"email":["This field must be unique."],"username":["A user with that username already exists."]}',
+            response.content.decode("utf-8"),
+        )
 
     def test_cannot_register_with_non_matching_passwords(self):
         self.user_attributes["confirm_password"] = "nonmatching123"
         response = self.client.post("/auth/register/", self.user_attributes)
         self.assertEqual(400, response.status_code)
+        self.assertEqual(
+            """{"password":["Password fields didn't match."]}""",
+            response.content.decode("utf-8"),
+        )

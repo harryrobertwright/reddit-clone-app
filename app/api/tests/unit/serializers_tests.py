@@ -15,8 +15,7 @@ class UserSerializerTest(TestCase):
         self.user = User.objects.create(
             username="testusername",
             email="test@email.com",
-            password="testpassword123"
-        )
+            password="testpassword123")
 
         self.serializer = UserSerializer(instance=self.user)
         self.data = self.serializer.data
