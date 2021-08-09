@@ -23,7 +23,8 @@ class TestRegisterSerializer(TestCase):
 
     def test_successful_user_creation_returns_user_object(self):
         self.assertIsInstance(
-            self.serializer.create(self.validated_data), User)
+            self.serializer.create(self.validated_data), User
+        )
 
     def test_database_is_empty_on_test_initialisation(self):
         self.assertEqual(0, User.objects.all().count())

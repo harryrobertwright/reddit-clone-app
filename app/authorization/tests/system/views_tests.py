@@ -27,7 +27,7 @@ class TestRegisterView(TestCase):
         response = self.client.post("/auth/register/", self.user_attributes)
         self.assertEqual(400, response.status_code)
         self.assertEqual(
-            '{"email":["This field must be unique."],"username":["A user with that username already exists."]}',
+            '{"message":["This email/username is already in use."]}',
             response.content.decode("utf-8"),
         )
 

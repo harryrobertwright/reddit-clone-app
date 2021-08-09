@@ -4,7 +4,7 @@ from rest_framework.serializers import ValidationError
 from authorization.serializers import RegisterSerializer
 
 
-class TestSerializerTest(TestCase):
+class TestRegisterSerializer(TestCase):
     def setUp(self):
         self.user_attributes = {
             "username": "testusername",

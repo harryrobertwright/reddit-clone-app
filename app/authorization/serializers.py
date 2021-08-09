@@ -1,16 +1,12 @@
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.core.validators import EmailValidator
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
 
 from .models import User
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(
-        required=True, validators=[
-            UniqueValidator(
-                queryset=User.objects.all())])
-
     password = serializers.CharField(
         write_only=True, required=True, validators=[validate_password]
     )
@@ -20,8 +16,24 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["email", "username", "password", "confirm_password"]
+        extra_kwargs = {
+            "username": {
+                "validators": [UnicodeUsernameValidator()],
+            },
+            "email": {
+                "validators": [EmailValidator()],
+            },
+        }
 
     def validate(self, attrs):
+        if (
+            User.objects.filter(username=attrs["username"]).exists()
+            or User.objects.filter(email=attrs["email"]).exists()
+        ):
+            raise serializers.ValidationError(
+                {"message": "This email/username is already in use."}
+            )
+
         if attrs["password"] != attrs["confirm_password"]:
             raise serializers.ValidationError(
                 {"password": "Password fields didn't match."}
