@@ -1,6 +1,5 @@
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.validators import UnicodeUsernameValidator
-from django.core.validators import EmailValidator
 from rest_framework import serializers
 
 from .models import User
@@ -19,10 +18,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "username": {
                 "validators": [UnicodeUsernameValidator()],
-            },
-            "email": {
-                "validators": [EmailValidator()],
-            },
+            }
         }
 
     def validate(self, attrs):
