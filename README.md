@@ -56,7 +56,8 @@ Allows a user to register and stores their details in the database
 
 **Content:**  
 
- * Duplicate email/username - `{  "email":  [  "This field must be unique."  ]  }`
+ * Duplicate email - `{  "email":  [  "This email is already in use."  ]  }`
+ * Duplicate username - `{  "username":  [  "This username is already in use."  ]  }`
  * Invalid email address - `{ "email": [ "Enter a valid email address." ] }`
  * Username too long - `{  "username":  [  "Ensure this field has no more than 150 characters."  ]  }`
  * Non-matching passwords - `{  "password":  [  "Password fields didn't match."  ]  }`

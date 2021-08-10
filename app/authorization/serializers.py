@@ -21,18 +21,26 @@ class RegisterSerializer(serializers.ModelSerializer):
             }
         }
 
-    def validate(self, attrs):
-        if (
-            User.objects.filter(username=attrs["username"]).exists()
-            or User.objects.filter(email=attrs["email"]).exists()
-        ):
-            raise serializers.ValidationError(
-                {"message": "This email/username is already in use."}
-            )
+    def validate_email(self, email):
+        if User.objects.filter(email=email).exists():
+            raise serializers.ValidationError("This email is already in use.")
 
+        return email
+
+    def validate_username(self, username):
+        if User.objects.filter(username=username).exists():
+            raise serializers.ValidationError(
+                "This username is already in use."
+            )
+          
+        return username    
+
+    def validate(self, attrs):
         if attrs["password"] != attrs["confirm_password"]:
             raise serializers.ValidationError(
-                {"password": "Password fields didn't match."}
+                {
+                    "password": "Password fields didn't match."
+                }
             )
 
         return attrs

@@ -11,5 +11,6 @@ class TestRegisterView(TestCase):
         self.assertEqual("User", self.view.queryset.model.__name__)
 
     def test_serializer_class_is_register_serializer(self):
-        self.assertEqual("RegisterSerializer",
-                         self.view.serializer_class.__name__)
+        self.assertEqual(
+            "RegisterSerializer", self.view.serializer_class.__name__
+        )

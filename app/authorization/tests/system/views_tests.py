@@ -27,8 +27,11 @@ class TestRegisterView(TestCase):
         response = self.client.post("/auth/register/", self.user_attributes)
         self.assertEqual(400, response.status_code)
         self.assertEqual(
-            '{"message":["This email/username is already in use."]}',
-            response.content.decode("utf-8"),
+            {
+                "email": ["This email is already in use."],
+                "username": ["This username is already in use."]
+            },
+            response.data,
         )
 
     def test_cannot_register_with_non_matching_passwords(self):
@@ -36,6 +39,8 @@ class TestRegisterView(TestCase):
         response = self.client.post("/auth/register/", self.user_attributes)
         self.assertEqual(400, response.status_code)
         self.assertEqual(
-            """{"password":["Password fields didn't match."]}""",
-            response.content.decode("utf-8"),
+            {
+                "password": ["Password fields didn't match."]
+            },
+            response.data,
         )
