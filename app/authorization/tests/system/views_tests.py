@@ -79,6 +79,18 @@ class TestLoginView(APITestCase):
         self.assertIsNotNone(response.data.get("refresh"))
         self.assertIsNotNone(response.data.get("access"))
 
+    def test_successful_login_returns_refresh_token_cookie(self):
+        request = self.factory.post(
+            "/auth/login/",
+            {
+                "username": self.user_attributes["username"],
+                "password": self.user_attributes["password"],
+            },
+        )
+
+        response = self.view.as_view()(request)
+        self.assertIsNotNone(response.cookies.get("refresh"))    
+
     def test_login_failure_with_invalid_credentials(self):
         request = self.factory.post(
             "/auth/login/",
