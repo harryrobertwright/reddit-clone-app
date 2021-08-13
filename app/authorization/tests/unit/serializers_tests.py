@@ -1,7 +1,9 @@
 from django.test import TestCase
 from rest_framework.serializers import ValidationError
 
-from authorization.serializers import LoginSerializer, RegisterSerializer
+from authorization.serializers import (
+    LoginSerializer, LoginRefreshSerializer, RegisterSerializer
+)
 
 
 class TestRegisterSerializer(TestCase):
@@ -46,4 +48,16 @@ class TestLoginSerializer(TestCase):
         self.assertEqual(
             set(self.data.keys()),
             set(["username", "password"]),
+        )
+
+
+class TestLoginRefreshSerializer(TestCase):
+    def setUp(self):
+        self.serializer = LoginRefreshSerializer()
+        self.data = self.serializer.data
+
+    def test_contains_expected_fields(self):
+        self.assertEqual(
+            set(self.data.keys()),
+            set(["refresh"]),
         )

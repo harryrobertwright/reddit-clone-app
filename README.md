@@ -54,7 +54,7 @@ Allows a user to register and stores their details in the database
 
 ----
 
-Returns an access and refresh token to authenticate user for future requests
+Returns an access token (valid for 300s) and refresh token cookie (valid for 7 days) to authenticate user for future requests
  
 *  **URL**  
 
@@ -74,7 +74,7 @@ Returns an access and refresh token to authenticate user for future requests
 
 *  **Code:** 200 OK
 
-**Content:**  `{ "refresh": <refresh_token>, "access": <access_token> }`
+**Content:**  `{ "access": <access_token> }`
 
 *  **Error Response:**
 
@@ -82,19 +82,26 @@ Returns an access and refresh token to authenticate user for future requests
 
 **Content:**  
 
+ * Empty field - `{ <field>: [ "This field is required." ] }`
+
+*  **Error Response:**
+
+ *  **Code:** 401 UNAUTHORIZED
+
+**Content:**  
+
  * Invalid credentials - `{ "detail": "No active account found with the given credentials" }`
- * Empty field - `{  <field>:  [  "This field may not be blank."  ]  }`
 
 **Sample Call:**
 
-```curl -H "Content-type: application/json" -d '{ "username" : "testusername", "password": "testpassword123, "confirm_password": "testpassword123"}`' 'http://127.0.0.1:8000/auth/login/'```
+```curl -H "Content-type: application/json" -d '{ "username" : "testusername", "password": "testpassword123"}`' 'http://127.0.0.1:8000/auth/login/'```
 
 
 ### Login (refresh)
 
 ----
 
-Returns a new access and refresh token to authenticate user given a valid refresh token
+Returns a new access token (valid for 300s) to authenticate user given a valid refresh token
  
 
 *  **URL**  
@@ -103,9 +110,9 @@ Returns a new access and refresh token to authenticate user given a valid refres
 
 *  **Method:**
 
-`POST`
+`GET`
 
-*  **Data Params**
+*  **Cookie Params**
 
 **Required:**
 
@@ -115,9 +122,13 @@ Returns a new access and refresh token to authenticate user given a valid refres
 
 *  **Code:** 200 OK
 
-**Content:**  `{ "refresh": <refresh_token>, "access": <access_token> }`
+**Content:**  `{ "access": <access_token> }`
 
 *  **Error Response:**
+
+ *  **Code:** 400 BAD REQUEST
+
+**Content:**  `{ "refresh": [ "This field is required." ] }`
 
  *  **Code:** 401 UNAUTHORIZED
 
@@ -125,4 +136,46 @@ Returns a new access and refresh token to authenticate user given a valid refres
 
 **Sample Call:**
 
-```curl -H "Content-type: application/json" -d '{ "refresh" : <refresh_token> }`' 'http://127.0.0.1:8000/auth/login/refresh/'```
+```curl -XGET -H 'Authorization: Bearer <refresh_token>' 'http://127.0.0.1:8000/auth/login/refresh/'```
+
+
+### Profile
+
+----
+
+Returns a logged in user's profile
+ 
+
+*  **URL**  
+
+/api/profile/
+
+*  **Method:**
+
+`GET`
+
+*  **Authorization Params**
+
+**Required:**
+
+**Content:**  `Bearer <access_token> }`
+
+*  **Success Response:**
+
+*  **Code:** 200 OK
+
+**Content:**  `{ "username": <username>, "date_joined": <date_joined>, "last_login": <last_login>, "avatar": <avatar> }`
+
+*  **Error Response:**
+
+ *  **Code:** 401 UNAUTHORIZED
+
+**Content:**  
+
+ * No credentials provided - `{ "detail": "Authentication credentials were not provided." }`
+ 
+ * Invalid token provided - `{ "detail": "Given token not valid for any token type", "code": "token_not_valid", "messages": [ { "token_class": "AccessToken", "token_type": "access", "message": "Token is invalid or expired" } ] }`
+
+**Sample Call:**
+
+```curl -XGET -H 'Authorization: Bearer <access_token>' 'http://127.0.0.1:8000/api/profile/'```

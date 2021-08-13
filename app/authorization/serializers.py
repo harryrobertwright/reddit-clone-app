@@ -1,7 +1,10 @@
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from rest_framework import serializers
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.serializers import (
+    TokenObtainPairSerializer, TokenRefreshSerializer
+)
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
 
@@ -64,3 +67,12 @@ class LoginSerializer(TokenObtainPairSerializer):
 
         token["username"] = user.username
         return token
+
+
+class LoginRefreshSerializer(TokenRefreshSerializer):
+    def validate(self, attrs):
+        refresh = RefreshToken(attrs["refresh"])
+
+        data = {"access": str(refresh.access_token)}
+
+        return data

@@ -1,9 +1,8 @@
 from django.test import Client, TestCase
 from rest_framework.test import APIRequestFactory, APITestCase
-from rest_framework_simplejwt.views import TokenRefreshView
 
 from authorization.models import User
-from authorization.views import LoginView, RegisterView
+from authorization.views import LoginView, LoginRefreshView, RegisterView
 
 
 class TestRegisterView(TestCase):
@@ -76,7 +75,6 @@ class TestLoginView(APITestCase):
 
         response = self.view.as_view()(request)
         self.assertEqual(200, response.status_code)
-        self.assertIsNotNone(response.data.get("refresh"))
         self.assertIsNotNone(response.data.get("access"))
 
     def test_successful_login_returns_refresh_token_cookie(self):
@@ -110,7 +108,7 @@ class TestLoginView(APITestCase):
         )
 
 
-class TestTokenRefreshView(APITestCase):
+class TestLoginRefreshView(APITestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
 
@@ -122,7 +120,7 @@ class TestTokenRefreshView(APITestCase):
 
         User.objects.create_user(**self.user_attributes)
 
-        self.view = TokenRefreshView()
+        self.view = LoginRefreshView()
 
         request = self.factory.post(
             "/auth/login/",
@@ -134,12 +132,11 @@ class TestTokenRefreshView(APITestCase):
 
         response = LoginView().as_view()(request)
 
-        self.refresh_token = response.data.get("refresh")
+        self.refresh_token = response.cookies.get("refresh").value
 
     def test_returns_new_access_token_when_valid_refresh_token_sent(self):
-        request = self.factory.post(
-            "/auth/login/refresh/", {"refresh": self.refresh_token}
-        )
+        request = self.factory.get("/auth/login/refresh/")
+        request.COOKIES["refresh"] = self.refresh_token
 
         response = self.view.as_view()(request)
 
@@ -147,12 +144,8 @@ class TestTokenRefreshView(APITestCase):
         self.assertIsNotNone(response.data.get("access"))
 
     def test_returns_error_when_invalid_refresh_token_sent(self):
-        request = self.factory.post(
-            "/auth/login/refresh/",
-            {
-                "refresh": "invalid_refresh_token"
-            },
-        )
+        request = self.factory.get("/auth/login/refresh/")
+        request.COOKIES["refresh"] = "invalid_refresh_token"
 
         response = self.view.as_view()(request)
 
