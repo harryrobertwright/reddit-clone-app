@@ -36,9 +36,7 @@ class LoginView(TokenObtainPairView):
         except TokenError as e:
             raise InvalidToken(e.args[0])
 
-        refresh_token = serializer.validated_data["refresh"]
-
-        del serializer.validated_data["refresh"]
+        refresh_token = serializer.validated_data.pop("refresh")
 
         response = Response(
             serializer.validated_data, status=status.HTTP_200_OK

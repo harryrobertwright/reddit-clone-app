@@ -148,7 +148,7 @@ Returns a logged in user's profile
 
 *  **URL**  
 
-/api/profile/
+/api/user/
 
 *  **Method:**
 
@@ -158,7 +158,7 @@ Returns a logged in user's profile
 
 **Required:**
 
-**Content:**  `Bearer <access_token> }`
+**Content:**  `{ Bearer <access_token> }`
 
 *  **Success Response:**
 
@@ -177,5 +177,5 @@ Returns a logged in user's profile
  * Invalid token provided - `{ "detail": "Given token not valid for any token type", "code": "token_not_valid", "messages": [ { "token_class": "AccessToken", "token_type": "access", "message": "Token is invalid or expired" } ] }`
 
 **Sample Call:**
-
-```curl -XGET -H 'Authorization: Bearer <access_token>' 'http://127.0.0.1:8000/api/profile/'```
+/
+```curl -XGET -H 'Authorization: Bearer <access_token>' 'http://127.0.0.1:8000/api/user/'```

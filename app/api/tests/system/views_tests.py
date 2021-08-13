@@ -29,23 +29,27 @@ class TestUserView(APITestCase):
 
         self.access_token = self.response.data.get("access")
 
-        self.view = UserView()
+        self.view = UserView().as_view()
 
     def test_is_successful_given_valid_bearer_token(self):
         request = self.factory.get(
-            "/api/profile/", HTTP_AUTHORIZATION=f"Bearer {self.access_token}"
+            "/api/user/", HTTP_AUTHORIZATION=f"Bearer {self.access_token}"
         )
 
-        response = self.view.as_view()(request)
+        response = self.view(request)
 
         self.assertEqual(200, response.status_code)
+        self.assertEqual(
+            set(response.data.keys()),
+            set(["username", "date_joined", "last_login", "avatar"]),
+        )
 
     def test_returns_error_given_invalid_bearer_token(self):
         request = self.factory.get(
-            "/api/profile/", HTTP_AUTHORIZATION="Bearer invalidaccesstoken"
+            "/api/user/", HTTP_AUTHORIZATION="Bearer invalidaccesstoken"
         )
 
-        response = self.view.as_view()(request)
+        response = self.view(request)
 
         self.assertEqual(401, response.status_code)
         self.assertEqual(
