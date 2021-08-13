@@ -1,6 +1,10 @@
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import (
+    TokenObtainPairSerializer, TokenRefreshSerializer
+)
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
 
@@ -32,8 +36,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "This username is already in use."
             )
-          
-        return username    
+
+        return username
 
     def validate(self, attrs):
         if attrs["password"] != attrs["confirm_password"]:
@@ -54,3 +58,21 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.save()
 
         return user
+
+
+class LoginSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super(LoginSerializer, cls).get_token(user)
+
+        token["username"] = user.username
+        return token
+
+
+class LoginRefreshSerializer(TokenRefreshSerializer):
+    def validate(self, attrs):
+        refresh = RefreshToken(attrs["refresh"])
+
+        data = {"access": str(refresh.access_token)}
+
+        return data
