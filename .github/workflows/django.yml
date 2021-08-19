@@ -1,0 +1,28 @@
+name: Django CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.6.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.6.8
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Install MongoDB
+      run: |
+        wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
+        echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+        sudo apt-get update
+        sudo apt-get install -y mongodb-org
+        sudo systemctl start mongod
+    - name: Run Tests
+      working-directory: ./app
+      run: |
+        python manage.py test --pattern="*_tests.py"
